@@ -6,6 +6,7 @@ import { FuelPlanRowComponent } from './ui/fuel-plan-row.component';
 import { NumberFieldComponent } from './ui/number-field.component';
 import { NutritionSummaryCardComponent } from './ui/nutrition-summary-card.component';
 import { ProductLibraryCardComponent } from './ui/product-library-card.component';
+import { NutritionValuePipe } from './pipes/nutrition-value.pipe';
 
 interface TotalCard {
   label: string;
@@ -16,13 +17,13 @@ interface TotalCard {
 
 @Component({
   selector: 'app-root',
-  standalone: true,
   imports: [
     CarbTargetPanelComponent,
     FuelPlanRowComponent,
     NumberFieldComponent,
     NutritionSummaryCardComponent,
     ProductLibraryCardComponent,
+    NutritionValuePipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -143,13 +144,13 @@ interface TotalCard {
                 <span role="columnheader">Sugar</span>
               </div>
 
-              @for (product of products; track product.id) {
+              @for (product of productsWithQuantities(); track product.id) {
                 <app-fuel-plan-row
                   [product]="product"
-                  [quantity]="quantity(product.id)"
-                  [carbsLabel]="format(productTotal(product, 'carbs'), 'g', 1)"
-                  [caloriesLabel]="format(productTotal(product, 'calories'), 'kcal', 0)"
-                  [sugarLabel]="format(productTotal(product, 'sugar'), 'g', 1)"
+                  [quantity]="product.quantity"
+                  [carbsLabel]="productTotal(product, 'carbs') | nutritionValue : 'g' : 1"
+                  [caloriesLabel]="productTotal(product, 'calories') | nutritionValue : 'kcal' : 0"
+                  [sugarLabel]="productTotal(product, 'sugar') | nutritionValue : 'g' : 1"
                   (quantityChange)="setQuantity(product.id, $event)"
                 />
               }
@@ -192,6 +193,13 @@ export class App {
   protected readonly quantities = signal<ProductQuantities>(
     this.productService.createEmptyQuantities(),
   );
+
+  protected readonly productsWithQuantities = computed(() => {
+    return this.products.map((product) => ({
+      ...product,
+      quantity: this.quantity(product.id),
+    }));
+  });
 
   protected readonly durationHours = computed(() => {
     const hours = this.raceHours();

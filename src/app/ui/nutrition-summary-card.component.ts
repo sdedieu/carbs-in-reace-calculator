@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 @Component({
   selector: 'app-nutrition-summary-card',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <article [class]="cardClasses()" data-test="summary-card">
@@ -18,7 +17,7 @@ export class NutritionSummaryCardComponent {
   readonly perHour = input.required<string>();
   readonly tone = input.required<string>();
 
-  protected cardClasses(): string {
+  protected cardClasses = computed(() => {
     const base =
       'grid min-h-28 content-between gap-3 rounded-lg border border-stone-900/10 bg-white p-4 shadow-sm border-t-4';
     const classes: Record<string, string> = {
@@ -33,5 +32,5 @@ export class NutritionSummaryCardComponent {
     };
 
     return classes[this.tone()] ?? classes['green'];
-  }
+  });
 }

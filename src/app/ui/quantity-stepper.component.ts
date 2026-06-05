@@ -4,7 +4,6 @@ const HOST_BINDINGS = { class: 'block min-w-0' };
 
 @Component({
   selector: 'app-quantity-stepper',
-  standalone: true,
   host: HOST_BINDINGS,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -47,7 +46,7 @@ const HOST_BINDINGS = { class: 'block min-w-0' };
 export class QuantityStepperComponent {
   readonly value = input.required<number>();
   readonly label = input.required<string>();
-  readonly step = input<number>(0.5);
+  readonly step = input<number>(1);
   readonly valueChange = output<string | number>();
 
   protected decrease(): void {

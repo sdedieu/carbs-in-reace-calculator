@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FuelProduct, ProductKind } from '../product.model';
 import { QuantityStepperComponent } from './quantity-stepper.component';
 
@@ -6,7 +6,6 @@ const HOST_BINDINGS = { class: 'block min-w-0' };
 
 @Component({
   selector: 'app-fuel-plan-row',
-  standalone: true,
   imports: [QuantityStepperComponent],
   host: HOST_BINDINGS,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -17,7 +16,7 @@ const HOST_BINDINGS = { class: 'block min-w-0' };
       data-test="plan-row"
     >
       <div class="grid min-w-0 grid-cols-[14px_minmax(0,1fr)] items-center gap-3" role="cell">
-        <span [class]="productKindClasses(product().kind)" aria-hidden="true"></span>
+        <span [class]="productKindClasses()" aria-hidden="true"></span>
         <div class="min-w-0">
           <strong class="block [overflow-wrap:anywhere]">{{ product().name }}</strong>
           <small class="text-sm font-semibold text-stone-500">
@@ -52,7 +51,11 @@ export class FuelPlanRowComponent {
     this.quantityChange.emit(value);
   }
 
-  protected productKindClasses(kind: ProductKind): string {
+  protected productKind = computed(() => 
+    this.product().kind
+  );
+
+  protected productKindClasses = computed(() => {
     const base = 'h-11 w-3.5 rounded-full';
     const classes: Record<ProductKind, string> = {
       drink: `${base} bg-blue-600`,
@@ -63,6 +66,6 @@ export class FuelPlanRowComponent {
       solid: `${base} bg-amber-500`,
     };
 
-    return classes[kind];
-  }
+    return classes[this.productKind()];
+  });
 }
